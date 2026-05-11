@@ -1,0 +1,203 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────
+// AUTH MODELS (NextAuth required)
+// ─────────────────────────────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime
+  image         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // relations
+
+  accounts  Account[]
+  sessions  Session[]
+  timelines UserTimeline[]
+}
+
+model Account {
+  id                String  @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String   @default(cuid())
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─────────────────────────────────────────
+// CORE ENTITIES
+// ─────────────────────────────────────────
+
+model Country {
+  id           String  @id @unique
+  name         String  @unique
+  isoCode      String  @unique
+  currencyCode String
+  flagEmoji    String
+  isActive     Boolean @default(true)
+
+  // relations
+
+  pofRules    PofRule[]
+  studyIntake StudyIntake[]
+  fxRates     FxRate         @relation(fields: [currencyCode], references: [currencyCode])
+  timelines   UserTimeline[]
+}
+
+model VisaPurpose {
+  id          String  @id @unique
+  name        String  @unique
+  slug        String  @unique // eg "study", "work", "tourism"
+  icon        String
+  description String?
+  isActive    Boolean @default(true)
+
+  // Relations
+  pofRules  PofRule[]
+  timelines UserTimeline[]
+}
+
+// ─────────────────────────────────────────
+// THE STRATEGY ENGINE
+// ─────────────────────────────────────────
+
+model PofRule {
+  id        String @default(cuid())
+  countryId String
+  purposeId String
+
+  // Buffer offsets in months
+  safeBufferMonths    Int // e.g. 6 for Canada Study
+  cautionBufferMonths Int // e.g. 3 for Canada Study
+  riskyBufferMonths   Int // e.g. 1 for Canada Study
+
+  // Minimum POF amount in foreign currency
+  minAmountForeign Float
+
+  // Does embassy scrutinise lump sums?
+  requiresHistory Boolean @default(false)
+
+  // Nigerian-specific analysis text
+  // Templated: supports {{parallelRate}}, {{safeDate}}, {{nairaTarget}}
+
+  analysisText     String @db.Text
+  nigerianSpecific String @db.Text
+
+  // Statement period embassy checks (in months)
+  statementMonths Int @default(3)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relations
+  country Country     @relation(fields: [countryId], references: [id])
+  purpose VisaPurpose @relation(fields: [purposeId], references: [id])
+
+  @@unique([countryId, purposeId])
+}
+
+// Study-specific intake months per country
+
+model StudyIntake {
+  id           String  @default(cuid())
+  countryId    String
+  intakeMonth  Int // 1 = Jan
+  intakeName   String // e.g. "September Main Intake"
+  isMainIntake Boolean @default(false)
+
+  country Country @relation(fields: [countryId], references: [id])
+
+  @@unique([countryId, intakeMonth])
+}
+
+// ─────────────────────────────────────────
+// FX RATES (Nigerian Context)
+// ─────────────────────────────────────────
+
+model FxRate {
+  currencyCode String   @id // e.g. "GBP"
+  cbnRate      Float // Official CBN rate
+  parallelRate Float // Black market / parallel rate
+  lastUpdated  DateTime @updatedAt
+
+  // Relations
+  countries Country[]
+}
+
+// ─────────────────────────────────────────
+// USER SAVED TIMELINES
+// ─────────────────────────────────────────
+
+model UserTimeline {
+  id        String @default(cuid())
+  userId    String
+  countryId String
+  purposeId String
+  slug      String @unique // eg "my-study-uk-plan"
+
+  // User inputs
+  intakeDate     DateTime
+  currentBalance Float // In Naira
+  targetAmount   Float // Calculated POF in Naira (parallel rate + buffer)
+  monthlyDeposit Float // Safe monthly deposit from analyzer
+
+  // Calculated timeline results
+  safeStartDate    DateTime
+  cautionStartDate DateTime
+  riskyStartDate   DateTime
+
+  // Status at time of save
+  currentStatus String // "safe" | "caution" | "risky"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  country Country     @relation(fields: [countryId], references: [id])
+  purpose VisaPurpose @relation(fields: [purposeId], references: [id])
+}

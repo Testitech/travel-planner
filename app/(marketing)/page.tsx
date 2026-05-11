@@ -1,53 +1,50 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ShieldAlert, LineChart, CalendarClock, ArrowRight, CheckCircle2 } from "lucide-react";
+import {
+  ShieldAlert,
+  LineChart,
+  CalendarClock,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
+import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
-      {/* NAVBAR */}
-      <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
-          <Link href="/" className="flex items-center gap-1 font-extrabold text-3xl tracking-tighter">
-            <span className="text-foreground">Sma</span>
-            <span className="text-primary">rrr</span>
-            <span className="text-foreground">t</span>
-          </Link>
-          <div className="hidden md:flex gap-6 font-medium text-sm text-gray-600">
-            <Link href="#features" className="hover:text-foreground transition-colors">Features</Link>
-            <Link href="#reality-check" className="hover:text-foreground transition-colors">The Reality</Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" className="hidden sm:inline-flex font-semibold">
-              Log In
-            </Button>
-            <Link href="/calculator">
-              <Button className="font-bold shadow-md hover:shadow-lg transition-all">
-                Start Planning
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <main>
         {/* HERO SECTION */}
         <section className="container mx-auto px-4 py-24 md:py-32 text-center max-w-4xl">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
             Stop Guessing Your <br className="hidden md:block" />
-            <span className="bg-primary text-primary-foreground px-4 leading-relaxed">Proof of Funds.</span>
+            <span className="bg-primary text-primary-foreground px-4 leading-relaxed">
+              Proof of Funds.
+            </span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Don&apos;t let FX volatility or embassy &quot;lump-sum flags ruin your visa chances. Map your exact Naira target, track parallel market rates, and build a bulletproof bank statement.
+            Don&apos;t let FX volatility or embassy &quot;lump-sum flags ruin
+            your visa chances. Map your exact Naira target, track parallel
+            market rates, and build a bulletproof bank statement.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/calculator">
-              <Button size="lg" className="w-full sm:w-auto font-bold text-lg h-14 px-8">
-                Calculate My POF Timeline <ArrowRight className="ml-2 h-5 w-5" />
+              <Button
+                size="lg"
+                className="w-full sm:w-auto font-bold text-lg h-14 px-8"
+              >
+                Calculate My POF Timeline{" "}
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto font-bold text-lg h-14 px-8 border-2 border-gray-200">
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full sm:w-auto font-bold text-lg h-14 px-8 border-2 border-gray-200"
+            >
               View Supported Countries
             </Button>
           </div>
@@ -58,11 +55,19 @@ export default function LandingPage() {
         </section>
 
         {/* REALITY CHECK SECTION (The Black Cards) */}
-        <section id="reality-check" className="bg-gray-50 py-20 border-y border-gray-100">
+        <section
+          id="reality-check"
+          className="bg-gray-50 py-20 border-y border-gray-100"
+        >
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Built for the Nigerian Reality</h2>
-              <p className="text-lg text-gray-600">Official embassy websites don&apos;t tell you about Form A delays or parallel market rates. We do.</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Built for the Nigerian Reality
+              </h2>
+              <p className="text-lg text-gray-600">
+                Official embassy websites don&apos;t tell you about Form A
+                delays or parallel market rates. We do.
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
@@ -74,11 +79,16 @@ export default function LandingPage() {
                     <h3 className="text-2xl font-bold">The UK Myth</h3>
                   </div>
                   <div className="space-y-4">
-                    <p className="text-gray-400 font-medium">❌ &quot;UKVI only needs the money to sit for 28 days.&quot;</p>
+                    <p className="text-gray-400 font-medium">
+                      ❌ &quot;UKVI only needs the money to sit for 28
+                      days.&quot;
+                    </p>
                     <div className="h-px w-full bg-gray-800"></div>
                     <p className="font-semibold text-lg leading-relaxed">
-                      <span className="text-primary mr-2">Reality:</span> 
-                      If you rely on CBN rates, bank delays for Form A can take 3 months. You actually need a 90-day preparation buffer to be safe.
+                      <span className="text-primary mr-2">Reality:</span>
+                      If you rely on CBN rates, bank delays for Form A can take
+                      3 months. You actually need a 90-day preparation buffer to
+                      be safe.
                     </p>
                   </div>
                 </CardContent>
@@ -92,11 +102,16 @@ export default function LandingPage() {
                     <h3 className="text-2xl font-bold">The Canada Trap</h3>
                   </div>
                   <div className="space-y-4">
-                    <p className="text-gray-400 font-medium">❌ &quot;I&apos;ll just borrow the money a week before applying.</p>
+                    <p className="text-gray-400 font-medium">
+                      ❌ &quot;I&apos;ll just borrow the money a week before
+                      applying.
+                    </p>
                     <div className="h-px w-full bg-gray-800"></div>
                     <p className="font-semibold text-lg leading-relaxed">
-                      <span className="text-primary mr-2">Reality:</span> 
-                      IRCC heavily targets Nigerian applications for &quot;financial manipulation.&quot; You need a 6-month organic deposit strategy to avoid rejection.
+                      <span className="text-primary mr-2">Reality:</span>
+                      IRCC heavily targets Nigerian applications for
+                      &quot;financial manipulation.&quot; You need a 6-month
+                      organic deposit strategy to avoid rejection.
                     </p>
                   </div>
                 </CardContent>
@@ -106,16 +121,20 @@ export default function LandingPage() {
         </section>
 
         {/* FEATURES SECTION */}
-        <section id="features" className="py-24 container mx-auto px-4 max-w-6xl">
+        <section
+          id="features"
+          className="py-24 container mx-auto px-4 max-w-6xl"
+        >
           <div className="grid md:grid-cols-3 gap-12 text-center md:text-left">
-            
             <div className="flex flex-col items-center md:items-start">
               <div className="h-14 w-14 rounded-2xl bg-primary/20 text-primary flex items-center justify-center mb-6">
                 <CalendarClock className="h-8 w-8 text-yellow-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Dynamic Timelines</h3>
               <p className="text-gray-600 leading-relaxed">
-                Select your intake date and we reverse-engineer your exact &quot;Safe&quot;, &quot;Caution&quot;, and &quot;Risky months to start saving&quot;.
+                Select your intake date and we reverse-engineer your exact
+                &quot;Safe&quot;, &quot;Caution&quot;, and &quot;Risky months to
+                start saving&quot;.
               </p>
             </div>
 
@@ -123,9 +142,13 @@ export default function LandingPage() {
               <div className="h-14 w-14 rounded-2xl bg-primary/20 text-primary flex items-center justify-center mb-6">
                 <LineChart className="h-8 w-8 text-yellow-600" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Parallel Market Tracking</h3>
+              <h3 className="text-xl font-bold mb-3">
+                Parallel Market Tracking
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Stop calculating with official rates you can&apos;t access. We track the real parallel market so you know exactly how much Naira you need today.
+                Stop calculating with official rates you can&apos;t access. We
+                track the real parallel market so you know exactly how much
+                Naira you need today.
               </p>
             </div>
 
@@ -133,12 +156,14 @@ export default function LandingPage() {
               <div className="h-14 w-14 rounded-2xl bg-primary/20 text-primary flex items-center justify-center mb-6">
                 <ShieldAlert className="h-8 w-8 text-yellow-600" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Statement Health Analyzer</h3>
+              <h3 className="text-xl font-bold mb-3">
+                Statement Health Analyzer
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Input your current balance, and we'll calculate your safe monthly deposit limit to avoid embassy lump-sum rejection flags.
+                Input your current balance, and we&apos;ll calculate your safe
+                monthly deposit limit to avoid embassy lump-sum rejection flags.
               </p>
             </div>
-
           </div>
         </section>
 
@@ -149,18 +174,19 @@ export default function LandingPage() {
               Your visa is too important <br /> to leave to guesswork.
             </h2>
             <Link href="/calculator">
-              <Button size="lg" className="font-bold text-lg h-14 px-10 shadow-[0_0_40px_-10px_rgba(255,204,0,0.5)]">
+              <Button
+                size="lg"
+                className="font-bold text-lg h-14 px-10 shadow-[0_0_40px_-10px_rgba(255,204,0,0.5)]"
+              >
                 Build Your Financial Strategy
               </Button>
             </Link>
           </div>
         </section>
       </main>
-      
+
       {/* FOOTER */}
-      <footer className="py-8 text-center text-gray-500 text-sm border-t border-gray-100">
-        <p>© {new Date().getFullYear()} Smarrrt. Built for Nigerian travelers.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
