@@ -158,6 +158,7 @@ function generateMonthlyBreakdown(
 ): MonthStatus[] {
   const breakdown: MonthStatus[] = [];
   const today = new Date();
+  console.log(today);
 
   // Generate 12 months starting from current month
   for (let i = 0; i < 12; i++) {
