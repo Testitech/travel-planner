@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getFxRate, formatNaira, formatForeign, formatRate } from "@/lib/fx";
+import { getFxRate, formatNaira } from "@/lib/fx";
 import { calculatePof, interpolateAnalysisText } from "@/lib/pof-engine";
 import type { ApiResponse, PofApiResponse } from "@/types";
 
@@ -80,11 +80,96 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(res, { status: 404 });
     }
 
+    const fxRate = await getFxRate(country.currencyCode);
 
+    const purpose = await prisma.visaPurpose.findUnique({
+      where: { id: purposeId },
+    });
 
-    const fxRate=await getFxRate(country.currencyCode)
+    let studyIntakes: number[] = [];
+    let studyIntakesFull = null;
 
+    if (purpose?.slug === "study") {
+      const intakes = await prisma.studyIntake.findMany({
+        where: { countryId },
+      });
+      studyIntakes = intakes.map((i) => i.intakeMonth);
+      studyIntakesFull = intakes;
+    }
 
-    
-  } catch (error) {}
+    const calculation = calculatePof({
+      rule,
+      fxRate,
+      intakeDate,
+      intakeMonths: studyIntakes,
+      currentBalanceNaira: currentBalance,
+    });
+
+    const interpolateAnalysis = interpolateAnalysisText(rule.analysisText, {
+      parallelRate: fxRate.parallelRate,
+      cbnRate: fxRate.cbnRate,
+      safeDate: calculation.safeStartDate.toLocaleDateString("en-NG", {
+        month: "long",
+        year: "numeric",
+      }),
+      cautionDate: calculation.cautionStartDate.toLocaleDateString("en-NG", {
+        month: "long",
+        year: "numeric",
+      }),
+      nairaTarget: formatNaira(calculation.recommendedNairaTarget),
+      monthlyDeposit: formatNaira(calculation.safeMonthlyDeposit),
+      currencyCode: country.currencyCode,
+      minAmountForeign: rule.minAmountForeign,
+    });
+
+    const interpolatedNigerianSpecific = interpolateAnalysisText(
+      rule.nigerianSpecific,
+      {
+        parallelRate: fxRate.parallelRate,
+        cbnRate: fxRate.cbnRate,
+        safeDate: calculation.safeStartDate.toLocaleDateString("en-NG", {
+          month: "long",
+          year: "numeric",
+        }),
+        cautionDate: calculation.cautionStartDate.toLocaleDateString("en-NG", {
+          month: "long",
+          year: "numeric",
+        }),
+        nairaTarget: formatNaira(calculation.recommendedNairaTarget),
+        monthlyDeposit: formatNaira(calculation.safeMonthlyDeposit),
+        currencyCode: country.currencyCode,
+        minAmountForeign: rule.minAmountForeign,
+      },
+    );
+
+    const response: PofApiResponse = {
+      success: true,
+      data: {
+        rule: {
+          ...rule,
+          analysisText: interpolateAnalysis,
+          nigeriaSpecific: interpolatedNigerianSpecific,
+        },
+        calculation,
+        fxRate,
+        studyIntakes: studyIntakesFull ?? undefined,
+      },
+    };
+
+    return NextResponse.json(response, {
+      status: 200,
+      headers: {
+        "Cache-Control": "private, max-age=120",
+      },
+    });
+  } catch (error) {
+    console.error("[api/calculate-pof] Calculation failed:", error);
+
+    const res: ApiResponse<null> = {
+      success: false,
+      error: "Calculation failed. Please try again.",
+    };
+
+    return NextResponse.json(res, { status: 500 });
+  }
 }
